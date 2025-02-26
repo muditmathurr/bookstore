@@ -29,70 +29,72 @@ function ShoppingBill()
         finalBill = totalBill;
     }
 
-    async function displayRazorPay()
-    {
-        const res = await loadRazorpayScript("https://checkout.razorpay.com/v1/checkout.js")
+    // async function displayRazorPay()
+    // {
+    //     const res = await loadRazorpayScript("https://checkout.razorpay.com/v1/checkout.js")
 
-        if(!res)
-        {
-            showToast("error","","Razorpay SDK failed to load, kindly check internet connection!")
-            return;
-        }
+    //     if(!res)
+    //     {
+    //         showToast("error","","Razorpay SDK failed to load, kindly check internet connection!")
+    //         return;
+    //     }
 
-        let finalBillAmount = (finalBill*100).toString()
+    //     let finalBillAmount = (finalBill*100).toString()
 
-        const dataResponse = await axios.post(
-            "https://bookztron-server.vercel.app/api/razorpay",
-            {
-                finalBillAmount
-            }
-        )
+    //     const dataResponse = await axios.post(
+    //         "https://bookztron-server.vercel.app/api/razorpay",
+    //         {
+    //             finalBillAmount
+    //         }
+    //     )
 
-        let data = dataResponse.data
+    //     let data = dataResponse.data
 
-        var options = {
-            "key": "rzp_test_hyc3ht0ngvqOD5", 
-            "amount": data.amount, 
-            "currency": data.currency,
-            "name": "Bookztron",
-            "description": "Thank you for shopping!",
-            "image": "https://raw.githubusercontent.com/Naman-Saxena1/Bookztron-E-Commerce_Book_Store/development/public/favicon-icon.png",
-            "order_id": data.id,
-            "handler": async function (response){
-                showToast("success","","Payment Successful! 😎")
-                showToast("success","","Order added to your bag!")
-                let newOrderItemsArray = userCart.map(orderItem=>{
-                    return {...orderItem, orderId: data.id}
-                })
-                let ordersUpdatedResponse = await axios.post(
-                    "https://bookztron-server.vercel.app/api/orders",
-                    {
-                        newOrderItemsArray
-                    },
-                    {
-                        headers : {'x-access-token': localStorage.getItem('token')}
-                    }
-                )
-                let emptyCartResponse = await axios.patch(
-                    "https://bookztron-server.vercel.app/api/cart/empty/all",
-                    {},
-                    {
-                        headers : {'x-access-token': localStorage.getItem('token')}
-                    }
-                )
-                if(emptyCartResponse.data.status==='ok')
-                {
-                    dispatchUserCart({type: "UPDATE_USER_CART",payload: []})
-                }
-                if(ordersUpdatedResponse.data.status==='ok')
-                {
-                    dispatchUserOrders({type: "UPDATE_USER_ORDERS",payload: ordersUpdatedResponse.data.user.orders})
-                    navigate('/orders')
-                }
-            }
-        };
-        var paymentObject = new window.Razorpay(options);
-        paymentObject.open();
+    //     var options = {
+    //         "key": "rzp_test_hyc3ht0ngvqOD5", 
+    //         "amount": data.amount, 
+    //         "currency": data.currency,
+    //         "name": "Bookztron",
+    //         "description": "Thank you for shopping!",
+    //         "order_id": data.id,
+    //         "handler": async function (response){
+    //             showToast("success","","Payment Successful! 😎")
+    //             showToast("success","","Order added to your bag!")
+    //             let newOrderItemsArray = userCart.map(orderItem=>{
+    //                 return {...orderItem, orderId: data.id}
+    //             })
+    //             let ordersUpdatedResponse = await axios.post(
+    //                 "https://bookztron-server.vercel.app/api/orders",
+    //                 {
+    //                     newOrderItemsArray
+    //                 },
+    //                 {
+    //                     headers : {'x-access-token': localStorage.getItem('token')}
+    //                 }
+    //             )
+    //             let emptyCartResponse = await axios.patch(
+    //                 "https://bookztron-server.vercel.app/api/cart/empty/all",
+    //                 {},
+    //                 {
+    //                     headers : {'x-access-token': localStorage.getItem('token')}
+    //                 }
+    //             )
+    //             if(emptyCartResponse.data.status==='ok')
+    //             {
+    //                 dispatchUserCart({type: "UPDATE_USER_CART",payload: []})
+    //             }
+    //             if(ordersUpdatedResponse.data.status==='ok')
+    //             {
+    //                 dispatchUserOrders({type: "UPDATE_USER_ORDERS",payload: ordersUpdatedResponse.data.user.orders})
+    //                 navigate('/orders')
+    //             }
+    //         }
+    //     };
+    //     var paymentObject = new window.Razorpay(options);
+    //     paymentObject.open();
+    // }
+    async function displaySuccess() {
+        showToast("success","","Payment Completed! Your Order Placed Successfully!😎")   
     }
 
     return (
@@ -163,7 +165,7 @@ function ShoppingBill()
 
             <button 
                 className="place-order-btn solid-secondary-btn"
-                onClick={displayRazorPay}
+                onClick={displaySuccess}
             >
                 Place Order
             </button>
